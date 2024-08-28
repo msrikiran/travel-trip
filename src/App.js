@@ -7,11 +7,22 @@ const initialItems = [
 ];
 
 function App() {
+  // const [items, setItems] = useState([]);
+  const [items, setItems] = useState(initialItems);
+
+  function handleAddItems(item) {
+    setItems((items) => [...items, item]);
+  }
+
+  function handleDeleteItems(id) {
+    console.log(id);
+    setItems((items) => items.filter((item) => item.id !== id));
+  }
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={handleAddItems} />
+      <PackingList items={items} onDeleteItems={handleDeleteItems} />
       <Stats />
     </div>
   );
@@ -21,7 +32,7 @@ function Logo() {
   return <h1>🌲 Far Away 💼💼</h1>;
 }
 
-function Form() {
+function Form({ onAddItems }) {
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState(1);
 
@@ -32,6 +43,8 @@ function Form() {
 
     const newItem = { description, quantity, packed: false, id: Date.now() };
     console.log(newItem);
+    onAddItems(newItem);
+
     setDescription('');
     setQuantity(1);
   }
@@ -61,26 +74,25 @@ function Form() {
   );
 }
 
-function PackingList() {
+function PackingList({ items, onDeleteItems }) {
   return (
     <div className="list">
       <ul className="list">
-        {initialItems.map((item) => (
-          <Item packItem={item} key={item.id} />
+        {items.map((item) => (
+          <Item packItem={item} key={item.id} onDeleteItems={onDeleteItems} />
         ))}
       </ul>
     </div>
   );
 }
 
-function Item(props) {
-  const { description, quantity, packed } = props.packItem;
+function Item({ packItem, onDeleteItems }) {
   return (
     <li>
-      <span style={packed ? { textDecoration: 'line-through' } : {}}>
-        {quantity + ' '} {description}
+      <span style={packItem.packed ? { textDecoration: 'line-through' } : {}}>
+        {packItem.quantity + ' '} {packItem.description}
       </span>
-      <button>❌</button>
+      <button onClick={() => onDeleteItems(packItem.id)}>❌</button>
     </li>
   );
 }
